@@ -2,7 +2,7 @@
 
 import { formatNumber } from "../lib/matrix";
 
-export default function CheckResult({ data }) {
+export default function ConsistencyResult({ data }) {
     if (!data) return null;
 
     return (
@@ -16,7 +16,7 @@ export default function CheckResult({ data }) {
 
             <p className={data.isConsistent ? "success" : "error"}>
                 {data.isConsistent
-                    ? "Матрица согласована (CR &lt; 0.1)"
+                    ? "Матрица согласована (CR < 0.1)"
                     : "Матрица плохо согласована (CR ≥ 0.1)"}
             </p>
         </div>

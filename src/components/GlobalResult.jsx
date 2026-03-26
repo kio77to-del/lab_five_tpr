@@ -1,16 +1,32 @@
 "use client";
 
-import { formatNumber } from "@/lib/matrix";
+import { formatNumber } from "../lib/matrix";
 
 export default function GlobalResult({ alternatives, globalPriorities }) {
     if (!alternatives.length || !globalPriorities.length) return null;
 
     const maxValue = Math.max(...globalPriorities);
     const bestIndex = globalPriorities.findIndex((item) => item === maxValue);
+    const bestAlternative = alternatives[bestIndex];
 
     return (
-        <div className="card">
-            <h3>Итоговые глобальные приоритеты</h3>
+        <div className="result-card">
+            <div className="result-badge">Итоговое решение</div>
+
+            <h3 className="result-title">Лучшая альтернатива</h3>
+
+            <div className="winner-box">
+                <div className="winner-name">{bestAlternative}</div>
+                <div className="winner-score">
+                    Глобальный приоритет: <strong>{formatNumber(maxValue)}</strong>
+                </div>
+            </div>
+
+            <p className="result-description">
+                По результатам метода анализа иерархий наилучшей альтернативой является{" "}
+                <strong>{bestAlternative}</strong>, так как она получила максимальный
+                глобальный приоритет среди всех рассматриваемых вариантов.
+            </p>
 
             <div className="table-wrapper">
                 <table>
@@ -18,22 +34,26 @@ export default function GlobalResult({ alternatives, globalPriorities }) {
                     <tr>
                         <th>Альтернатива</th>
                         <th>Глобальный приоритет</th>
+                        <th>Место</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {alternatives.map((item, index) => (
-                        <tr key={index}>
-                            <td>{item}</td>
-                            <td>{formatNumber(globalPriorities[index])}</td>
-                        </tr>
-                    ))}
+                    {[...alternatives]
+                        .map((alternative, index) => ({
+                            alternative,
+                            priority: globalPriorities[index],
+                        }))
+                        .sort((a, b) => b.priority - a.priority)
+                        .map((item, index) => (
+                            <tr key={item.alternative} className={index === 0 ? "best-row" : ""}>
+                                <td>{item.alternative}</td>
+                                <td>{formatNumber(item.priority)}</td>
+                                <td>{index + 1}</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
-
-            <p className="success">
-                Лучшая альтернатива: <strong>{alternatives[bestIndex]}</strong>
-            </p>
         </div>
     );
 }

@@ -5,12 +5,15 @@ import InputSection from "../components/InputSection";
 import StepSection from "../components/StepSection";
 import PairwiseMatrix from "../components/PairwiseMatrix";
 import PriorityResult from "../components/PriorityResult";
-import CheckResult from "../components/CheckResult";
+import ConsistencyResult from "../components/ConsistencyResult";
 import GlobalResult from "../components/GlobalResult";
+import SummaryTable from "../components/SummaryTable";
 import {
   defaultGoal,
   defaultCriteriaText,
   defaultAlternativesText,
+  exampleCriteriaMatrix,
+  exampleAlternativeMatrices,
 } from "../data/defaultData";
 import {
   createPairwiseMatrix,
@@ -53,6 +56,40 @@ export default function HomePage() {
     });
 
     setAlternativeMatrices(newAlternativeMatrices);
+  };
+
+  const handleLoadExample = () => {
+    const parsedCriteria = parseLines(defaultCriteriaText);
+    const parsedAlternatives = parseLines(defaultAlternativesText);
+
+    setGoal(defaultGoal);
+    setCriteriaText(defaultCriteriaText);
+    setAlternativesText(defaultAlternativesText);
+
+    setCriteria(parsedCriteria);
+    setAlternatives(parsedAlternatives);
+
+    setCriteriaMatrix(exampleCriteriaMatrix);
+
+    const newAlternativeMatrices = {};
+    parsedCriteria.forEach((criterion) => {
+      newAlternativeMatrices[criterion] =
+          exampleAlternativeMatrices[criterion] ||
+          createPairwiseMatrix(parsedAlternatives.length);
+    });
+
+    setAlternativeMatrices(newAlternativeMatrices);
+  };
+
+  const handleResetAll = () => {
+    setGoal("");
+    setCriteriaText("");
+    setAlternativesText("");
+
+    setCriteria([]);
+    setAlternatives([]);
+    setCriteriaMatrix([]);
+    setAlternativeMatrices({});
   };
 
   const handleCriteriaMatrixChange = (row, col, value) => {
@@ -116,6 +153,8 @@ export default function HomePage() {
               alternativesText={alternativesText}
               setAlternativesText={setAlternativesText}
               onCreateMatrices={handleCreateMatrices}
+              onLoadExample={handleLoadExample}
+              onResetAll={handleResetAll}
           />
         </StepSection>
 
@@ -136,7 +175,7 @@ export default function HomePage() {
                     onChangeMatrix={handleCriteriaMatrixChange}
                 />
                 <PriorityResult items={criteria} data={criteriaData} />
-                <CheckResult data={criteriaData} />
+                <ConsistencyResult data={criteriaData} />
               </StepSection>
 
               <StepSection title="Шаг 3. Матрицы попарных сравнений альтернатив">
@@ -154,12 +193,22 @@ export default function HomePage() {
                           items={alternatives}
                           data={alternativeDataMap[criterion]}
                       />
-                      <CheckResult data={alternativeDataMap[criterion]} />
+                      <ConsistencyResult data={alternativeDataMap[criterion]} />
                     </div>
                 ))}
               </StepSection>
 
-              <StepSection title="Шаг 4. Итоговый выбор лучшей альтернативы">
+              <StepSection title="Шаг 4. Сводная таблица результатов">
+                <SummaryTable
+                    criteria={criteria}
+                    alternatives={alternatives}
+                    criteriaWeights={criteriaData?.priorities || []}
+                    alternativeDataMap={alternativeDataMap}
+                    globalPriorities={globalPriorities}
+                />
+              </StepSection>
+
+              <StepSection title="Шаг 5. Итоговый выбор лучшей альтернативы">
                 <GlobalResult
                     alternatives={alternatives}
                     globalPriorities={globalPriorities}

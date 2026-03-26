@@ -8,6 +8,8 @@ export default function InputSection({
                                          alternativesText,
                                          setAlternativesText,
                                          onCreateMatrices,
+                                         onLoadExample,
+                                         onResetAll,
                                      }) {
     return (
         <div className="card">
@@ -39,7 +41,15 @@ export default function InputSection({
                 />
             </div>
 
-            <button onClick={onCreateMatrices}>Создать матрицы</button>
+            <div className="button-row">
+                <button onClick={onCreateMatrices}>Создать матрицы</button>
+                <button type="button" className="secondary-button" onClick={onLoadExample}>
+                    Заполнить пример
+                </button>
+                <button type="button" className="danger-button" onClick={onResetAll}>
+                    Сбросить всё
+                </button>
+            </div>
         </div>
     );
 }
